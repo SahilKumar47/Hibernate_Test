@@ -2,6 +2,8 @@ package com.bookapp.model.dao;
 
 import java.util.List;
 
+import javax.persistence.Query;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -58,7 +60,13 @@ public class BookDaoImpl implements BookDao {
 		Book book = null;
 		try {
 			tx.begin();
-			book = (Book) session.createQuery("select b from Book b where b.isbn=isbn");
+			String hql = "select b from Book b where b.isbn= :isbn";
+			Query query = session.createQuery(hql);
+			query.setParameter("isbn", isbn);
+			List<Book> bookList = query.getResultList();
+			for (Book b : bookList) {
+				book = b;
+			}
 			Publisher publisher = book.getPublisher();
 			List<Chapter> chapter = book.getChapters();
 			tx.commit();
